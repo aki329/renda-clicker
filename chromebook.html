@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Chromebookで使う 連打ツール</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: #1d1d1f;
+        background: #f5f5f7;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: #f5f5f7;
+      }
+
+      main {
+        width: min(820px, calc(100vw - 28px));
+        display: grid;
+        gap: 14px;
+      }
+
+      .top {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 12px;
+        border-bottom: 1px solid #d2d2d7;
+        padding-bottom: 12px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 24px;
+        line-height: 1.1;
+        letter-spacing: 0;
+      }
+
+      .status {
+        color: #6e6e73;
+        font-size: 12px;
+        font-weight: 900;
+      }
+
+      .local-warning {
+        display: none;
+        border: 1px solid #86868b;
+        border-radius: 8px;
+        padding: 12px;
+        color: #1d1d1f;
+        background: #ffffff;
+        font-size: 13px;
+        font-weight: 800;
+        line-height: 1.5;
+      }
+
+      body[data-local-page="true"] .local-warning {
+        display: block;
+      }
+
+      .actions {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+      }
+
+      button {
+        min-height: 42px;
+        border: 1px solid #1d1d1f;
+        border-radius: 6px;
+        padding: 0 14px;
+        color: #ffffff;
+        background: #1d1d1f;
+        font: inherit;
+        font-weight: 900;
+        cursor: pointer;
+      }
+
+      button.secondary {
+        color: #1d1d1f;
+        background: #ffffff;
+        border-color: #d2d2d7;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+      }
+
+      .step,
+      .tile,
+      .note {
+        border: 1px solid #d2d2d7;
+        border-radius: 8px;
+        padding: 12px;
+        background: #ffffff;
+      }
+
+      .steps {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+      }
+
+      .step {
+        min-height: 92px;
+      }
+
+      .label {
+        display: block;
+        color: #6e6e73;
+        font-size: 11px;
+        font-weight: 900;
+      }
+
+      .text,
+      .step-text {
+        display: block;
+        margin-top: 6px;
+        color: #1d1d1f;
+        font-size: 13px;
+        line-height: 1.35;
+      }
+
+      .step-label {
+        display: block;
+        color: #1d1d1f;
+        font-size: 18px;
+        font-weight: 900;
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 126px;
+        box-sizing: border-box;
+        border: 1px solid #d2d2d7;
+        border-radius: 6px;
+        padding: 10px;
+        color: #1d1d1f;
+        background: #ffffff;
+        font: 12px/1.35 ui-monospace, SFMono-Regular, Menlo, monospace;
+        resize: vertical;
+      }
+
+      .code-block {
+        display: grid;
+        gap: 8px;
+      }
+
+      .code-head {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .code-title {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 900;
+      }
+
+      .code-note {
+        color: #6e6e73;
+        font-size: 11px;
+        font-weight: 800;
+      }
+
+      .mini-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+
+      .mini-actions button {
+        min-height: 36px;
+      }
+
+      .note {
+        color: #1d1d1f;
+        font-size: 12px;
+        line-height: 1.5;
+      }
+
+      @media (max-width: 680px) {
+        .actions,
+        .steps,
+        .grid,
+        .mini-actions {
+          grid-template-columns: 1fr;
+        }
+
+        button {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header class="top">
+        <h1>連打ツール</h1>
+        <span class="status">Chromebook用</span>
+      </header>
+
+      <p class="local-warning">
+        今のURLはMacの中だけです。Chromebookでは、GitHub Pagesなどで公開したURLを開いてください。
+      </p>
+
+      <section class="steps" aria-label="使い方">
+        <div class="step"><span class="step-label">1. コピー</span><span class="step-text">下のコードをコピー</span></div>
+        <div class="step"><span class="step-label">2. 貼る</span><span class="step-text">ブックマークのURL欄へ貼る</span></div>
+        <div class="step"><span class="step-label">3. 起動</span><span class="step-text">使うサイトでブックマークを押す</span></div>
+      </section>
+
+      <section class="code-block" aria-label="確認コード">
+        <div class="code-head">
+          <h2 class="code-title">テスト</h2>
+          <span class="code-note">先にこれで確認</span>
+        </div>
+        <div class="mini-actions">
+          <button id="copyTestButton" class="secondary" type="button">コピー</button>
+          <button id="selectTestButton" class="secondary" type="button">選択</button>
+        </div>
+        <textarea id="testCode" readonly>読み込み中</textarea>
+      </section>
+
+      <section class="code-block" aria-label="通常コード">
+        <div class="code-head">
+          <h2 class="code-title">連打コード</h2>
+          <span class="code-note">基本はこちら</span>
+        </div>
+        <div class="actions">
+          <button id="copyButton" type="button">コピー</button>
+          <button id="selectButton" class="secondary" type="button">選択</button>
+        </div>
+        <textarea id="bookmarkletCode" readonly>読み込み中</textarea>
+      </section>
+
+      <section class="code-block" aria-label="短いコード">
+        <div class="code-head">
+          <h2 class="code-title">短いコード</h2>
+          <span class="code-note">公開URLだけ</span>
+        </div>
+        <div class="mini-actions">
+          <button id="copyShortButton" class="secondary" type="button">コピー</button>
+          <button id="selectShortButton" class="secondary" type="button">選択</button>
+        </div>
+        <textarea id="shortCode" readonly>読み込み中</textarea>
+      </section>
+
+      <section class="grid" aria-label="メモ">
+        <div class="tile"><span class="label">ON/OFF</span><span class="text">設定したキーかEscで停止</span></div>
+        <div class="tile"><span class="label">CPS</span><span class="text">1から100まで変更できます</span></div>
+        <div class="tile"><span class="label">学校端末</span><span class="text">禁止されている場合は使えません</span></div>
+      </section>
+
+      <p id="statusText" class="note">学校で禁止されている場合は使えません。先生か管理者に確認してください。</p>
+    </main>
+
+    <script id="embeddedBookmarkletSource" type="application/json">"(function () {\n  const ID = \"aki-bookmarklet-clicker\";\n  const STORE_KEY = \"akiBookmarkletClickerSettings\";\n  const LAUNCHER_ID = \"aki-bookmarklet-clicker-launcher\";\n  const VERSION = \"2026-07-08-simple-100cps\";\n  const TOGGLE_DEBOUNCE_MS = 350;\n  const DEFAULTS = {\n    cps: 30,\n    panelHidden: false,\n    panelSide: \"right\",\n    hotkey: {\n      key: \"c\",\n      code: \"KeyC\",\n      altKey: true,\n      ctrlKey: false,\n      metaKey: false,\n      shiftKey: true,\n      label: \"Option+Shift+C\"\n    }\n  };\n\n  const existing = window.__akiBookmarkletClicker;\n  if (existing && existing.version === VERSION && typeof existing.show === \"function\") {\n    existing.show();\n    return;\n  }\n  if (existing) {\n    try {\n      if (typeof existing.stop === \"function\") existing.stop();\n    } catch (_error) {\n      // Continue replacing an older panel.\n    }\n    const oldRoot = document.getElementById(ID);\n    const oldLauncher = document.getElementById(LAUNCHER_ID);\n    if (oldRoot) oldRoot.remove();\n    if (oldLauncher) oldLauncher.remove();\n  }\n\n  let settings = loadSettings();\n  let active = false;\n  let timerId = null;\n  let nextClickAt = 0;\n  let measureTimerId = null;\n  let clickCountThisSecond = 0;\n  let measuredCps = 0;\n  let recordingHotkey = false;\n  let lastToggleAt = 0;\n  let pointer = {\n    x: Math.max(1, Math.round(window.innerWidth / 2)),\n    y: Math.max(1, Math.round(window.innerHeight / 2))\n  };\n\n  const root = document.createElement(\"div\");\n  root.id = ID;\n  root.innerHTML = `\n    \u003cstyle>\n      #${ID} {\n        position: fixed;\n        right: 12px;\n        bottom: 12px;\n        z-index: 2147483647;\n        width: 252px;\n        color: #1d1d1f;\n        background: #ffffff;\n        border: 1px solid #d2d2d7;\n        border-radius: 6px;\n        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.42);\n        font: 12px/1.35 -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif;\n        letter-spacing: 0;\n      }\n      #${ID}[data-minimized=\"true\"] .aki-clicker-body {\n        display: none;\n      }\n      #${ID}[data-side=\"left\"] {\n        left: 12px;\n        right: auto;\n      }\n      #${LAUNCHER_ID} {\n        position: fixed;\n        right: 12px;\n        bottom: 12px;\n        z-index: 2147483647;\n        min-height: 34px;\n        border: 1px solid #d2d2d7;\n        border-radius: 6px;\n        padding: 0 10px;\n        color: #1d1d1f;\n        background: #ffffff;\n        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);\n        font: 700 12px/1 -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif;\n        cursor: pointer;\n      }\n      #${LAUNCHER_ID}[data-active=\"true\"] {\n        color: #ffffff;\n        border-color: #1d1d1f;\n        background: #1d1d1f;\n      }\n      #${LAUNCHER_ID}[data-side=\"left\"] {\n        left: 12px;\n        right: auto;\n      }\n      #${ID} * {\n        box-sizing: border-box;\n        font: inherit;\n      }\n      #${ID} .aki-clicker-head {\n        display: flex;\n        align-items: center;\n        justify-content: space-between;\n        gap: 8px;\n        padding: 8px 9px;\n        color: #1d1d1f;\n        background: #f5f5f7;\n        border-bottom: 1px solid #d2d2d7;\n        border-radius: 6px 6px 0 0;\n        font-weight: 900;\n      }\n      #${ID}[data-active=\"true\"] .aki-clicker-head {\n        color: #ffffff;\n        background: #1d1d1f;\n      }\n      #${ID} .aki-clicker-head button {\n        width: 24px;\n        min-width: 24px;\n        height: 24px;\n        border: 1px solid #c7c7cc;\n        border-radius: 5px;\n        color: #1d1d1f;\n        background: #ffffff;\n        cursor: pointer;\n      }\n      #${ID} .aki-clicker-body {\n        display: grid;\n        gap: 8px;\n        padding: 9px;\n      }\n      #${ID} button {\n        min-height: 32px;\n        border: 1px solid #c7c7cc;\n        border-radius: 6px;\n        color: #1d1d1f;\n        background: #ffffff;\n        font-weight: 900;\n        cursor: pointer;\n      }\n      #${ID} .aki-toggle {\n        color: #ffffff;\n        border-color: #1d1d1f;\n        background: #1d1d1f;\n      }\n      #${ID} .aki-secondary {\n        color: #1d1d1f;\n        background: #ffffff;\n      }\n      #${ID} .aki-remove {\n        color: #1d1d1f;\n        border-color: #1d1d1f;\n        background: #ffffff;\n      }\n      #${ID} label {\n        display: grid;\n        grid-template-columns: 1fr 68px;\n        align-items: center;\n        gap: 8px;\n        color: #1d1d1f;\n        font-weight: 900;\n      }\n      #${ID} input[type=\"number\"] {\n        width: 68px;\n        min-height: 30px;\n        border: 1px solid #c7c7cc;\n        border-radius: 6px;\n        padding: 4px 7px;\n        color: #1d1d1f;\n        background: #ffffff;\n        font-weight: 800;\n      }\n      #${ID} input[type=\"range\"] {\n        width: 100%;\n        accent-color: #1d1d1f;\n      }\n      #${ID} .aki-presets,\n      #${ID} .aki-split {\n        display: grid;\n        grid-template-columns: repeat(4, 1fr);\n        gap: 6px;\n      }\n      #${ID} .aki-split {\n        grid-template-columns: 1fr 1fr;\n      }\n      #${ID} .aki-presets button,\n      #${ID} .aki-split button {\n        min-height: 30px;\n        padding: 0 6px;\n        font-size: 12px;\n      }\n      #${ID} .aki-hotkey {\n        display: grid;\n        grid-template-columns: 1fr auto;\n        align-items: center;\n        gap: 8px;\n      }\n      #${ID} .aki-muted {\n        color: #6e6e73;\n        font-size: 11px;\n        font-weight: 800;\n      }\n      #${ID} .aki-note {\n        color: #1d1d1f;\n        background: #f5f5f7;\n        border-radius: 6px;\n        padding: 8px;\n        font-size: 11px;\n      }\n      #${ID} .aki-check {\n        display: flex;\n        align-items: center;\n        justify-content: space-between;\n        grid-template-columns: none;\n        border: 1px solid #d2d2d7;\n        border-radius: 6px;\n        padding: 8px;\n        background: #ffffff;\n      }\n      #${ID} .aki-check input {\n        width: 18px;\n        height: 18px;\n        accent-color: #1d1d1f;\n      }\n    \u003c/style>\n    \u003cdiv class=\"aki-clicker-head\">\n      \u003cspan class=\"aki-title\">\u505c\u6b62\u003c/span>\n      \u003cspan>\n        \u003cbutton class=\"aki-hide\" type=\"button\" title=\"\u975e\u8868\u793a\">\u00d7\u003c/button>\n        \u003cbutton class=\"aki-minimize\" type=\"button\" title=\"\u5c0f\u3055\u304f\u3059\u308b\">-\u003c/button>\n      \u003c/span>\n    \u003c/div>\n    \u003cdiv class=\"aki-clicker-body\">\n      \u003cbutton class=\"aki-toggle\" type=\"button\">\u958b\u59cb / \u505c\u6b62\u003c/button>\n      \u003clabel>\n        \u003cspan>CPS\u003c/span>\n        \u003cinput class=\"aki-cps-input\" type=\"number\" min=\"1\" max=\"100\" step=\"1\">\n      \u003c/label>\n      \u003cinput class=\"aki-cps-range\" type=\"range\" min=\"1\" max=\"100\" step=\"1\">\n      \u003cdiv class=\"aki-presets\">\n        \u003cbutton class=\"aki-secondary\" type=\"button\" data-cps=\"10\">10\u003c/button>\n        \u003cbutton class=\"aki-secondary\" type=\"button\" data-cps=\"30\">30\u003c/button>\n        \u003cbutton class=\"aki-secondary\" type=\"button\" data-cps=\"60\">60\u003c/button>\n        \u003cbutton class=\"aki-secondary\" type=\"button\" data-cps=\"100\">100\u003c/button>\n      \u003c/div>\n      \u003cdiv class=\"aki-hotkey\">\n        \u003cdiv>\n          \u003cdiv class=\"aki-muted\">\u30ad\u30fc\u003c/div>\n          \u003cstrong class=\"aki-hotkey-text\">Option+Shift+C\u003c/strong>\n        \u003c/div>\n        \u003cbutton class=\"aki-record aki-secondary\" type=\"button\">\u5909\u66f4\u003c/button>\n      \u003c/div>\n      \u003cdiv class=\"aki-record-note aki-muted\" hidden>\u003c/div>\n      \u003cdiv class=\"aki-split\">\n        \u003cbutton class=\"aki-side-left aki-secondary\" type=\"button\">\u5de6\u4e0b\u003c/button>\n        \u003cbutton class=\"aki-side-right aki-secondary\" type=\"button\">\u53f3\u4e0b\u003c/button>\n      \u003c/div>\n      \u003cdiv class=\"aki-muted\">Esc\u3067\u505c\u6b62\u003c/div>\n      \u003cbutton class=\"aki-remove aki-secondary\" type=\"button\">\u524a\u9664\u003c/button>\n      \u003cdiv class=\"aki-note\">\u5371\u967a\u306a\u753b\u9762\u3067\u306f\u505c\u6b62\u003c/div>\n    \u003c/div>\n  `;\n  document.documentElement.append(root);\n  const launcher = document.createElement(\"button\");\n  launcher.id = LAUNCHER_ID;\n  launcher.type = \"button\";\n  launcher.textContent = \"\u8868\u793a\";\n  document.documentElement.append(launcher);\n\n  const title = root.querySelector(\".aki-title\");\n  const hideButton = root.querySelector(\".aki-hide\");\n  const minimizeButton = root.querySelector(\".aki-minimize\");\n  const toggleButton = root.querySelector(\".aki-toggle\");\n  const cpsInput = root.querySelector(\".aki-cps-input\");\n  const cpsRange = root.querySelector(\".aki-cps-range\");\n  const presetButtons = root.querySelectorAll(\"[data-cps]\");\n  const hotkeyText = root.querySelector(\".aki-hotkey-text\");\n  const recordButton = root.querySelector(\".aki-record\");\n  const recordNote = root.querySelector(\".aki-record-note\");\n  const sideLeftButton = root.querySelector(\".aki-side-left\");\n  const sideRightButton = root.querySelector(\".aki-side-right\");\n  const removeButton = root.querySelector(\".aki-remove\");\n\n  window.addEventListener(\"mousemove\", updatePointer, true);\n  window.addEventListener(\"pointermove\", updatePointer, true);\n  window.addEventListener(\"pointerdown\", updatePointer, true);\n  window.addEventListener(\"keydown\", handleKeydown, true);\n  document.addEventListener(\"visibilitychange\", handleVisibilityChange);\n\n  toggleButton.addEventListener(\"click\", function () {\n    toggle();\n  });\n  hideButton.addEventListener(\"click\", hidePanel);\n  launcher.addEventListener(\"click\", showPanel);\n  minimizeButton.addEventListener(\"click\", function () {\n    const minimized = root.dataset.minimized !== \"true\";\n    root.dataset.minimized = String(minimized);\n    minimizeButton.textContent = minimized ? \"+\" : \"-\";\n  });\n  cpsInput.addEventListener(\"change\", function () {\n    setCps(cpsInput.value);\n  });\n  cpsRange.addEventListener(\"input\", function () {\n    setCps(cpsRange.value);\n  });\n  presetButtons.forEach(function (button) {\n    button.addEventListener(\"click\", function () {\n      setCps(button.dataset.cps);\n    });\n  });\n  recordButton.addEventListener(\"click\", function () {\n    recordingHotkey = true;\n    recordButton.textContent = \"\u5165\u529b\u4e2d\";\n    recordNote.hidden = false;\n    recordNote.textContent = \"\u30ad\u30fc\u5165\u529b\";\n  });\n  sideLeftButton.addEventListener(\"click\", function () {\n    setPanelSide(\"left\");\n  });\n  sideRightButton.addEventListener(\"click\", function () {\n    setPanelSide(\"right\");\n  });\n  removeButton.addEventListener(\"click\", destroy);\n\n  window.__akiBookmarkletClicker = {\n    version: VERSION,\n    show: function () {\n      showPanel();\n    },\n    stop: stop,\n    destroy: destroy\n  };\n\n  if (settings.panelHidden) {\n    hidePanel(false);\n  } else {\n    showPanel(false);\n  }\n  render();\n\n  function start() {\n    if (active) return;\n    active = true;\n    nextClickAt = performance.now();\n    clickCountThisSecond = 0;\n    measuredCps = 0;\n    startMeasureLoop();\n    render();\n    runClickLoop();\n  }\n\n  function stop() {\n    if (!active) return;\n    active = false;\n    clearTimeout(timerId);\n    clearInterval(measureTimerId);\n    timerId = null;\n    nextClickAt = 0;\n    measureTimerId = null;\n    measuredCps = 0;\n    render();\n  }\n\n  function toggle() {\n    const now = performance.now();\n    if (now - lastToggleAt \u003c TOGGLE_DEBOUNCE_MS) return;\n    lastToggleAt = now;\n    active ? stop() : start();\n  }\n\n  function handleVisibilityChange() {\n    if (document.hidden) stop();\n  }\n\n  function destroy() {\n    stop();\n    window.removeEventListener(\"mousemove\", updatePointer, true);\n    window.removeEventListener(\"pointermove\", updatePointer, true);\n    window.removeEventListener(\"pointerdown\", updatePointer, true);\n    window.removeEventListener(\"keydown\", handleKeydown, true);\n    document.removeEventListener(\"visibilitychange\", handleVisibilityChange);\n    try {\n      localStorage.removeItem(STORE_KEY);\n    } catch (_error) {\n      // Storage may be blocked. Removing the visible tool still works.\n    }\n    root.remove();\n    launcher.remove();\n    try {\n      delete window.__akiBookmarkletClicker;\n    } catch (_error) {\n      window.__akiBookmarkletClicker = null;\n    }\n  }\n\n  function runClickLoop() {\n    if (!active) return;\n\n    const now = performance.now();\n    const interval = 1000 / settings.cps;\n    let fired = 0;\n    if (!nextClickAt) nextClickAt = now;\n\n    while (now >= nextClickAt && fired \u003c 10) {\n      clickAtPointer();\n      nextClickAt += interval;\n      fired += 1;\n    }\n\n    const delay = fired > 0 ? 1 : Math.max(1, nextClickAt - performance.now());\n    timerId = window.setTimeout(runClickLoop, delay);\n  }\n\n  function clickAtPointer() {\n    if (!active) return;\n    const point = getClickPoint();\n    const target = document.elementFromPoint(point.x, point.y);\n    if (!target || target.closest(\"#\" + ID) || target.closest(\"#\" + LAUNCHER_ID)) return;\n\n    if (clickCookieClicker(target, point)) {\n      clickCountThisSecond += 1;\n      return;\n    }\n\n    const eventOptions = {\n      bubbles: true,\n      cancelable: true,\n      composed: true,\n      view: window,\n      clientX: point.x,\n      clientY: point.y,\n      screenX: window.screenX + point.x,\n      screenY: window.screenY + point.y,\n      button: 0,\n      buttons: 1\n    };\n\n    if (typeof PointerEvent === \"function\") {\n      target.dispatchEvent(new PointerEvent(\"pointerdown\", Object.assign({}, eventOptions, {\n        pointerId: 1,\n        pointerType: \"mouse\",\n        isPrimary: true\n      })));\n    }\n    target.dispatchEvent(new MouseEvent(\"mousedown\", eventOptions));\n    target.dispatchEvent(new MouseEvent(\"mouseup\", Object.assign({}, eventOptions, { buttons: 0 })));\n    if (typeof PointerEvent === \"function\") {\n      target.dispatchEvent(new PointerEvent(\"pointerup\", Object.assign({}, eventOptions, {\n        buttons: 0,\n        pointerId: 1,\n        pointerType: \"mouse\",\n        isPrimary: true\n      })));\n    }\n    target.dispatchEvent(new MouseEvent(\"click\", Object.assign({}, eventOptions, { buttons: 0 })));\n    clickCountThisSecond += 1;\n  }\n\n  function handleKeydown(event) {\n    if (event.key === \"Escape\") {\n      if (active) {\n        event.preventDefault();\n        event.stopPropagation();\n        stop();\n      }\n      if (recordingHotkey) {\n        recordingHotkey = false;\n        recordButton.textContent = \"\u5909\u66f4\";\n        recordNote.hidden = true;\n      }\n      return;\n    }\n    if (recordingHotkey) {\n      captureHotkey(event);\n      return;\n    }\n    if (event.repeat || !matchesHotkey(event, settings.hotkey)) return;\n    event.preventDefault();\n    event.stopPropagation();\n    toggle();\n  }\n\n  function captureHotkey(event) {\n    event.preventDefault();\n    event.stopPropagation();\n\n    if (event.key === \"Escape\") {\n      recordNote.textContent = \"Esc\u306f\u505c\u6b62\u5c02\u7528\";\n      return;\n    }\n\n    if ([\"Control\", \"Shift\", \"Alt\", \"Meta\"].includes(event.key)) {\n      recordNote.textContent = \"\u6587\u5b57\u30ad\u30fc\u3082\u62bc\u3059\";\n      return;\n    }\n\n    const next = normalizeHotkey({\n      key: event.key,\n      code: event.code,\n      altKey: event.altKey,\n      ctrlKey: event.ctrlKey,\n      metaKey: event.metaKey,\n      shiftKey: event.shiftKey\n    });\n\n    if (!isSafeHotkey(next)) {\n      recordNote.textContent = \"Option/Shift\u3082\u5fc5\u8981\";\n      return;\n    }\n\n    recordingHotkey = false;\n    settings.hotkey = next;\n    saveSettings();\n    recordButton.textContent = \"\u5909\u66f4\";\n    recordNote.hidden = true;\n    render();\n  }\n\n  function setPanelSide(side) {\n    settings.panelSide = side === \"left\" ? \"left\" : \"right\";\n    saveSettings();\n    render();\n  }\n\n  function getClickPoint() {\n    return {\n      x: clamp(Math.round(pointer.x), 0, Math.max(0, window.innerWidth - 1)),\n      y: clamp(Math.round(pointer.y), 0, Math.max(0, window.innerHeight - 1))\n    };\n  }\n\n  function setCps(value) {\n    settings.cps = normalizeCps(value);\n    saveSettings();\n    if (active) {\n      clearTimeout(timerId);\n      timerId = null;\n      nextClickAt = performance.now();\n      runClickLoop();\n    }\n    render();\n  }\n\n  function hidePanel(shouldSave) {\n    root.hidden = true;\n    launcher.hidden = false;\n    settings.panelHidden = true;\n    if (shouldSave !== false) saveSettings();\n    render();\n  }\n\n  function showPanel(shouldSave) {\n    root.hidden = false;\n    launcher.hidden = true;\n    root.dataset.minimized = \"false\";\n    minimizeButton.textContent = \"-\";\n    settings.panelHidden = false;\n    if (shouldSave !== false) saveSettings();\n    render();\n  }\n\n  function startMeasureLoop() {\n    clearInterval(measureTimerId);\n    measureTimerId = window.setInterval(function () {\n      measuredCps = clickCountThisSecond;\n      clickCountThisSecond = 0;\n      render();\n    }, 1000);\n  }\n\n  function updatePointer(event) {\n    pointer = {\n      x: clamp(Math.round(event.clientX), 0, Math.max(0, window.innerWidth - 1)),\n      y: clamp(Math.round(event.clientY), 0, Math.max(0, window.innerHeight - 1))\n    };\n  }\n\n  function render() {\n    root.dataset.active = String(active);\n    root.dataset.side = settings.panelSide;\n    launcher.dataset.side = settings.panelSide;\n    title.textContent = active ? \"\u52d5\u4f5c\u4e2d\" : \"\u505c\u6b62\";\n    cpsInput.value = String(settings.cps);\n    cpsRange.value = String(settings.cps);\n    hotkeyText.textContent = settings.hotkey.label;\n    launcher.textContent = active ? \"\u52d5\u4f5c\u4e2d\" : \"\u8868\u793a\";\n    launcher.dataset.active = String(active);\n  }\n\n  function loadSettings() {\n    try {\n      return normalizeSettings(JSON.parse(localStorage.getItem(STORE_KEY)));\n    } catch (_error) {\n      return normalizeSettings(null);\n    }\n  }\n\n  function saveSettings() {\n    try {\n      localStorage.setItem(STORE_KEY, JSON.stringify(settings));\n    } catch (_error) {\n      // Private browsing or blocked storage: keep the setting for this page only.\n    }\n  }\n\n  function normalizeSettings(value) {\n    return {\n      cps: normalizeCps(value && value.cps),\n      panelHidden: Boolean(value && value.panelHidden),\n      panelSide: value && value.panelSide === \"left\" ? \"left\" : DEFAULTS.panelSide,\n      hotkey: normalizeHotkey(value && value.hotkey)\n    };\n  }\n\n  function normalizeCps(value) {\n    if (value === null || value === undefined || value === \"\") return DEFAULTS.cps;\n    const number = Number(value);\n    if (!Number.isFinite(number)) return DEFAULTS.cps;\n    return Math.min(100, Math.max(1, Math.round(number)));\n  }\n\n  function normalizeHotkey(value) {\n    if (!value || typeof value !== \"object\") return DEFAULTS.hotkey;\n    const key = typeof value.key === \"string\" && value.key ? value.key : DEFAULTS.hotkey.key;\n    const next = {\n      key: key,\n      code: typeof value.code === \"string\" ? value.code : \"\",\n      altKey: Boolean(value.altKey),\n      ctrlKey: Boolean(value.ctrlKey),\n      metaKey: Boolean(value.metaKey),\n      shiftKey: Boolean(value.shiftKey),\n      label: \"\"\n    };\n    next.label = formatHotkey(next);\n    return next;\n  }\n\n  function matchesHotkey(event, hotkey) {\n    return event.altKey === hotkey.altKey\n      && event.ctrlKey === hotkey.ctrlKey\n      && event.metaKey === hotkey.metaKey\n      && event.shiftKey === hotkey.shiftKey\n      && (event.code === hotkey.code || String(event.key || \"\").toLowerCase() === String(hotkey.key || \"\").toLowerCase());\n  }\n\n  function isSafeHotkey(value) {\n    const hasModifier = value.altKey || value.ctrlKey || value.metaKey || value.shiftKey;\n    const isSingleTextKey = value.key.length === 1 && /^[a-z0-9]$/i.test(value.key);\n    return hasModifier || !isSingleTextKey;\n  }\n\n  function formatHotkey(value) {\n    const parts = [];\n    if (value.ctrlKey) parts.push(\"Control\");\n    if (value.altKey) parts.push(\"Option\");\n    if (value.metaKey) parts.push(\"Command\");\n    if (value.shiftKey) parts.push(\"Shift\");\n    parts.push(formatKeyName(value.key || value.code));\n    return parts.join(\"+\");\n  }\n\n  function formatKeyName(key) {\n    if (!key) return \"Key\";\n    if (key === \" \") return \"Space\";\n    if (key.length === 1) return key.toUpperCase();\n    return key.replace(/^Arrow/, \"\");\n  }\n\n  function clamp(value, min, max) {\n    return Math.min(max, Math.max(min, value));\n  }\n\n  function clickCookieClicker(target, point) {\n    let cookie = target.id === \"bigCookie\"\n      ? target\n      : target.closest && target.closest(\"#bigCookie\");\n    if (!cookie) {\n      const candidate = document.getElementById(\"bigCookie\");\n      if (candidate) {\n        const rect = candidate.getBoundingClientRect();\n        const inside = point.x >= rect.left\n          && point.x \u003c= rect.right\n          && point.y >= rect.top\n          && point.y \u003c= rect.bottom;\n        if (inside) cookie = candidate;\n      }\n    }\n    if (!cookie || !window.Game || typeof window.Game.ClickCookie !== \"function\") {\n      return false;\n    }\n\n    try {\n      window.Game.ClickCookie({\n        target: cookie,\n        currentTarget: cookie,\n        clientX: point.x,\n        clientY: point.y,\n        pageX: point.x + window.scrollX,\n        pageY: point.y + window.scrollY,\n        preventDefault: function () {},\n        stopPropagation: function () {}\n      });\n      return true;\n    } catch (_error) {\n      return false;\n    }\n  }\n})();\n"</script>
+
+    <script>
+      const textarea = document.getElementById("bookmarkletCode");
+      const testCode = document.getElementById("testCode");
+      const shortCode = document.getElementById("shortCode");
+      const copyButton = document.getElementById("copyButton");
+      const selectButton = document.getElementById("selectButton");
+      const copyTestButton = document.getElementById("copyTestButton");
+      const selectTestButton = document.getElementById("selectTestButton");
+      const copyShortButton = document.getElementById("copyShortButton");
+      const selectShortButton = document.getElementById("selectShortButton");
+      const statusText = document.getElementById("statusText");
+
+      init();
+
+      async function init() {
+        document.body.dataset.localPage = String(isLocalPage());
+        testCode.value = "javascript:alert('連打ツールのテストOK')";
+        try {
+          const source = await loadBookmarkletSource();
+          textarea.value = "javascript:" + encodeURIComponent(source.trim());
+          shortCode.value = isLocalPage() ? "" : buildShortCode();
+          copyButton.disabled = false;
+          copyShortButton.disabled = !shortCode.value;
+          if (isLocalPage()) {
+            statusText.textContent = "Chromebookでは公開URLでこのページを開いてください。今は通常コードだけ使えます。";
+          } else {
+            statusText.textContent = "まずテストを保存して、使うサイトで押してください。OKなら連打コードを使います。";
+          }
+        } catch (_error) {
+          textarea.value = "";
+          shortCode.value = "";
+          statusText.textContent = "コードを作れませんでした。先生か管理者に確認してください。";
+          copyButton.disabled = true;
+          copyShortButton.disabled = true;
+        }
+      }
+
+      async function loadBookmarkletSource() {
+        const embedded = document.getElementById("embeddedBookmarkletSource");
+        if (embedded && embedded.textContent.trim()) {
+          return JSON.parse(embedded.textContent);
+        }
+        return fetch("./bookmarklet-source.js").then((response) => {
+          if (!response.ok) throw new Error("source not found");
+          return response.text();
+        });
+      }
+
+      copyButton.addEventListener("click", async () => {
+        await copyCode(textarea, "連打コードをコピーしました。");
+      });
+
+      selectButton.addEventListener("click", () => {
+        selectCode(textarea, "連打コードを選択しました。");
+      });
+
+      copyTestButton.addEventListener("click", async () => {
+        await copyCode(testCode, "テストコードをコピーしました。");
+      });
+
+      selectTestButton.addEventListener("click", () => {
+        selectCode(testCode, "テストコードを選択しました。");
+      });
+
+      copyShortButton.addEventListener("click", async () => {
+        await copyCode(shortCode, "短いコードをコピーしました。");
+      });
+
+      selectShortButton.addEventListener("click", () => {
+        selectCode(shortCode, "短いコードを選択しました。");
+      });
+
+      async function copyCode(target, message) {
+        if (!target.value) return;
+        target.select();
+        try {
+          await navigator.clipboard.writeText(target.value);
+          statusText.textContent = message;
+        } catch (_error) {
+          document.execCommand("copy");
+          statusText.textContent = "コピーできない場合は、選択して手動でコピーしてください。";
+        }
+      }
+
+      function selectCode(target, message) {
+        target.focus();
+        target.select();
+        statusText.textContent = message;
+      }
+
+      function buildShortCode() {
+        const sourceUrl = new URL("./bookmarklet-source.js", location.href).href;
+        return "javascript:(function(){var s=document.createElement('script');s.src='" + sourceUrl.replace(/'/g, "%27") + "?v=' + Date.now();document.documentElement.appendChild(s);})();";
+      }
+
+      function isLocalPage() {
+        return location.hostname === "localhost"
+          || location.hostname === "127.0.0.1"
+          || location.protocol === "file:";
+      }
+    </script>
+  </body>
+</html>
